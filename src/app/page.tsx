@@ -1,101 +1,130 @@
+"use client";
+
+import Navbar from "@/components/Navbar";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./firebaseConfig";
 
-export default function Home() {
+export default function HomePage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
+
+  // Handle button click to navigate based on authentication
+  const handleButtonClick = () => {
+    setLoading(true);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push("/emotions");
+      } else {
+        router.push("/signin");
+      }
+      setLoading(false);
+    });
+  };
+
+  // Fetch user's name when authenticated
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserName(user.displayName || "User"); // Set the user's display name or default to "User"
+      } else {
+        setUserName(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-white to-sky-300 text-gray-800 px-4 sm:px-6">
+      <Navbar />
+      {/* Profile Button */}
+      <div className="w-full flex justify-end px-4 py-3 mt-3">
+        {userName ? (
+          <button
+            onClick={() => router.push("/profile")}
+            className="text-lg  font-semibold text-blue-600 hover:bg-sky-300 hover:rounded-md hover:px-2 hover:py-1"
+          >
+            {userName}
+          </button>
+        ) : (
+          <a
+            href="/signin"
+            className="text-lg text-blue-600 font-semibold hover:text-blue-800"
+          >
+            Sign In
+          </a>
+        )}
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      <h1 className="text-4xl sm:text-5xl font-bold mb-6 text-center px-2">
+        Welcome to{" "}
+        <span className="text-4xl sm:text-5xl font-bold text-sky-500">
+          CalmBridge
+        </span>
+      </h1>
+      <p className="text-base sm:text-lg mb-8 text-center px-4 text-gray-600 font-bold">
+        Manage your Stress, Anxiety, & Depression with ease. We will help you
+        feel life again from a new perspective.
+      </p>
+      <p className="text-base sm:text-lg mb-8 text-center px-4 text-yellow-500 font-bold ">
+        Take actionable steps to obtain a positive Impact on your Mental Health.
+      </p>
+
+      <div>
+        <button
+          onClick={handleButtonClick}
+          disabled={loading}
+          className={`${
+            loading ? "bg-gray-400" : "bg-sky-600 hover:bg-sky-700"
+          } mb-6 px-4 py-2 rounded-md text-sm sm:text-base text-white w-full sm:w-auto`}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
+          {loading ? "Loading..." : "Start Living Again"}
+        </button>
+      </div>
+
+      {/* <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center">
+        <a
+          href="/signin"
+          className="px-4 py-2 bg-white text-blue-600 rounded-lg shadow hover:shadow-md hover:bg-gray-100 text-center"
+        >
+          Sign In
         </a>
         <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="/signup"
+          className="px-4 py-2 bg-blue-700 text-white rounded-lg shadow hover:shadow-md hover:bg-blue-800 text-center"
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
+          Sign Up
         </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      </div> */}
+
+      <div className="mt-8">
+        <Image
+          src="https://plus.unsplash.com/premium_vector-1723130555423-89a41d83f3dd?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="CalmBridge Illustration"
+          width={300}
+          height={150}
+          className="rounded-lg shadow-md w-full max-w-xs sm:max-w-md"
+        />
+      </div>
+
+      {/* Wavy SVG */}
+      <div className=" bottom-0 w-full">
+        <svg
+          viewBox="0 0 1440 320"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full h-auto"
         >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <path
+            fill="#87CEEB"
+            fillOpacity="0.6"
+            d="M0,224L30,213.3C60,203,120,181,180,186.7C240,192,300,224,360,234.7C420,245,480,235,540,213.3C600,192,660,160,720,160C780,160,840,192,900,213.3C960,235,1020,245,1080,224C1140,203,1200,149,1260,117.3C1320,85,1380,75,1410,69.3L1440,64L1440,320L1410,320C1380,320,1320,320,1260,320C1200,320,1140,320,1080,320C1020,320,960,320,900,320C840,320,780,320,720,320C660,320,600,320,540,320C480,320,420,320,360,320C300,320,240,320,180,320C120,320,60,320,30,320L0,320Z"
+          ></path>
+        </svg>
+      </div>
+    </main>
   );
 }
