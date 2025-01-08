@@ -13,8 +13,8 @@ import { useAuth } from "@/context/AuthContext"; // Assuming you have an auth co
 
 export default function ObjectivePage() {
   const { user } = useAuth();
-  const [tasks, setTasks] = useState<any[]>([]);
-  const [completedTasks, setCompletedTasks] = useState<any[]>([]);
+  const [tasks, setTasks] = useState<string[]>([]); // Updated type from any[] to string[]
+  const [completedTasks, setCompletedTasks] = useState<string[]>([]); // Updated type from any[] to string[]
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
@@ -90,7 +90,7 @@ export default function ObjectivePage() {
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-white to-sky-300 text-gray-800">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full md:w-2/3 lg:w-1/2">
         <h1 className="text-3xl font-bold text-center text-gray-800">
-          Today's Objective
+          Today&apos;s Objective
         </h1>
 
         {loading ? (

@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -8,7 +9,6 @@ import {
   arrayUnion,
   arrayRemove,
   getDoc,
-  setDoc,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { useSearchParams } from "next/navigation";
@@ -56,9 +56,11 @@ export default function TasksPage() {
     ],
   };
 
-  const tasks = emotion
-    ? tasksByEmotion[emotion] || [{ task: "No specific tasks.", duration: 0 }]
-    : [{ task: "No specific tasks.", duration: 0 }];
+  const tasks = useMemo(() => {
+    return emotion
+      ? tasksByEmotion[emotion] || [{ task: "No specific tasks.", duration: 0 }]
+      : [{ task: "No specific tasks.", duration: 0 }];
+  }, [emotion]);
 
   const taskEmojis: { [key: string]: string } = {
     "Celebrate your achievements": "🎉",

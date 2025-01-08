@@ -18,13 +18,15 @@ export default function SignIn() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/"); // Redirect to emotions page after successful sign-in
-    } catch (error: any) {
-      setError("Sign-in failed! Please check your credentials.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError("Sign-in failed! Please check your credentials.");
+      }
     }
   };
 
   return (
-    <main className="flex flex-col items-center justify-center h-screen bg-gray-100 ">
+    <main className="flex flex-col items-center justify-center h-screen bg-gray-100">
       <h1 className="text-3xl font-bold mb-6">Sign In</h1>
       <form
         onSubmit={handleSignIn}
@@ -54,7 +56,7 @@ export default function SignIn() {
       {error && <p className="mt-4 text-red-600">{error}</p>}{" "}
       {/* Error message display */}
       <p className="mt-4 text-gray-600">
-        Don't have an account?{" "}
+        Don&apos;t have an account?{" "}
         <Link href="/signup" className="text-blue-600 hover:underline">
           Sign Up
         </Link>

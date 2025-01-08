@@ -1,29 +1,16 @@
+import Link from "next/link"; // Make sure to import Link from 'next/link'
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth, db } from "@/app/firebaseConfig";
-import {
-  User,
-  onAuthStateChanged,
-  signOut,
-  updateProfile,
-} from "firebase/auth";
-import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
-import LogPage from "@/app/WeeklyLog/page";
+import { auth } from "@/app/firebaseConfig";
+import { signOut } from "firebase/auth";
 
 const Navbar = () => {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [profileData, setProfileData] = useState<{
-    name: string;
-    email: string;
-  }>({ name: "", email: "" });
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      setUser(null);
-      setProfileData({ name: "", email: "" });
       router.push("/");
     } catch (error) {
       console.error("Error logging out:", error);
@@ -42,60 +29,60 @@ const Navbar = () => {
 
         {/* Desktop Navbar */}
         <div className="hidden md:flex space-x-3">
-          <a
+          <Link
             href="/"
             className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
           >
             Home
-          </a>
-          <a
+          </Link>
+          <Link
             href="/emotions"
             className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
           >
             Emotions
-          </a>
-          <a
+          </Link>
+          <Link
             href="/tasks"
             className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
           >
             Tasks
-          </a>
-          <a
+          </Link>
+          <Link
             href="/rewards"
             className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
           >
             Rewards
-          </a>
-          <a
+          </Link>
+          <Link
             href="/objective"
             className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
           >
             Objectives
-          </a>
-          <a
+          </Link>
+          <Link
             href="/WeeklyLog"
             className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
           >
             WeeklyLog
-          </a>
-          <a
+          </Link>
+          <Link
             href="/profile"
             className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
           >
             Profile
-          </a>
-          <a
+          </Link>
+          <Link
             href="/signin"
             className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
           >
             SignIn
-          </a>
-          <a
+          </Link>
+          <button
             onClick={handleLogout}
-            className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300 cursor-pointer"
+            className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
           >
             Logout
-          </a>
+          </button>
         </div>
 
         {/* Mobile Hamburger Button */}
@@ -125,54 +112,60 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-sky-700 text-white p-4 rounded-lg">
-          <a
+          <Link
             href="/"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
           >
             Home
-          </a>
-          <a
+          </Link>
+          <Link
             href="/emotions"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
           >
             Emotions
-          </a>
-          <a
+          </Link>
+          <Link
             href="/tasks"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
           >
             Tasks
-          </a>
-          <a
+          </Link>
+          <Link
             href="/rewards"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
           >
             Rewards
-          </a>
-          <a
+          </Link>
+          <Link
             href="/objective"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
           >
             Objectives
-          </a>
-          <a
+          </Link>
+          <Link
+            href="/WeeklyLog"
+            className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
+          >
+            WeeklyLog
+          </Link>
+          <Link
             href="/profile"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
           >
             Profile
-          </a>
-          <a
+          </Link>
+          <Link
             href="/signin"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
           >
             SignIn
-          </a>
-          <a
+          </Link>
+          <button
             onClick={handleLogout}
-            className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300 cursor-pointer"
+            className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
           >
             Logout
-          </a>
+          </button>
         </div>
       )}
     </nav>
