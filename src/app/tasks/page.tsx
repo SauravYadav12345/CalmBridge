@@ -1,8 +1,7 @@
 "use client";
 
-import React from "react";
-import { useMemo, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useMemo, useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   doc,
   updateDoc,
@@ -11,7 +10,6 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
@@ -19,6 +17,10 @@ import { useAuth } from "@/context/AuthContext";
 export default function TasksPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams(); // Ensure it's used correctly
+  const [emotion, setEmotion] = useState<string | null>(null);
+  const [completedTasks, setCompletedTasks] = useState<string[]>([]);
+  
   const userInitials = user?.displayName
     ? user.displayName.slice(0, 2).toUpperCase()
     : "?";
@@ -52,10 +54,6 @@ export default function TasksPage() {
     ],
   };
 
-  const [completedTasks, setCompletedTasks] = useState<string[]>([]);
-  const [emotion, setEmotion] = useState<string | null>(null); // use local state for emotion
-  const searchParams = useSearchParams();
-
   const tasks = useMemo(() => {
     return emotion
       ? tasksByEmotion[emotion] || [{ task: "No specific tasks.", duration: 0 }]
@@ -79,7 +77,8 @@ export default function TasksPage() {
   };
 
   useEffect(() => {
-    setEmotion(searchParams.get("emotion"));
+    const emotionFromParams = searchParams.get("emotion");
+    setEmotion(emotionFromParams);
 
     if (user?.uid) {
       const fetchCompletedTasks = async () => {
@@ -100,7 +99,7 @@ export default function TasksPage() {
 
       fetchCompletedTasks();
     }
-  }, [user, emotion, tasks]);
+  }, [user, tasks, searchParams]);
 
   const saveTaskCompletion = async (task: string) => {
     if (user?.uid) {
@@ -132,7 +131,7 @@ export default function TasksPage() {
         </div>
         <h1 className="text-3xl font-bold text-center">Your Tasks</h1>
 
-        <React.Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>Loading...</div>}>
           {emotion && (
             <div className="mt-4 text-center">
               <h2 className="text-xl font-semibold">
@@ -182,7 +181,7 @@ export default function TasksPage() {
               </ul>
             </div>
           )}
-        </React.Suspense>
+        </Suspense>
 
         <div className="mt-6 flex justify-center items-center w-full px-8">
           <Link href="/rewards">
