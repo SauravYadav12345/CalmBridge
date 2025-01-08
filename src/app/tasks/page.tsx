@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
-import { useState, useEffect } from "react";
+import React from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   doc,
@@ -13,7 +13,7 @@ import {
 import { db } from "../firebaseConfig";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa"; // Import arrow icons
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 
 export default function TasksPage() {
@@ -22,10 +22,6 @@ export default function TasksPage() {
   const userInitials = user?.displayName
     ? user.displayName.slice(0, 2).toUpperCase()
     : "?";
-  const searchParams = useSearchParams();
-  const emotion = searchParams.get("emotion") as
-    | keyof typeof tasksByEmotion
-    | null;
 
   const tasksByEmotion: {
     [key: string]: { task: string; duration: number }[];
@@ -56,6 +52,10 @@ export default function TasksPage() {
     ],
   };
 
+  const [completedTasks, setCompletedTasks] = useState<string[]>([]);
+  const [emotion, setEmotion] = useState<string | null>(null); // use local state for emotion
+  const searchParams = useSearchParams();
+
   const tasks = useMemo(() => {
     return emotion
       ? tasksByEmotion[emotion] || [{ task: "No specific tasks.", duration: 0 }]
@@ -78,9 +78,9 @@ export default function TasksPage() {
     "No specific tasks.": "❓",
   };
 
-  const [completedTasks, setCompletedTasks] = useState<string[]>([]);
-
   useEffect(() => {
+    setEmotion(searchParams.get("emotion"));
+
     if (user?.uid) {
       const fetchCompletedTasks = async () => {
         const userRef = doc(db, "users", user.uid);
@@ -89,14 +89,11 @@ export default function TasksPage() {
         if (userDoc.exists()) {
           const userData = userDoc.data();
           setCompletedTasks(userData?.completedTasks || []);
-          console.log("Completed Tasks:", userData?.completedTasks); // Debug log
 
-          // Add pending tasks to Firestore if they are not already saved
           if (!userData?.tasks || userData?.tasks.length === 0) {
             await updateDoc(userRef, {
               tasks: arrayUnion(...tasks.map((task) => task.task)),
             });
-            console.log("Pending tasks added to Firestore.");
           }
         }
       };
@@ -109,20 +106,16 @@ export default function TasksPage() {
     if (user?.uid) {
       const userRef = doc(db, "users", user.uid);
       try {
-        console.log(`Saving task: ${task}`);
         await updateDoc(userRef, {
           tasks: arrayRemove(task),
           completedTasks: arrayUnion(task),
         });
         setCompletedTasks((prev) => [...prev, task]);
-        console.log(`Task "${task}" saved successfully.`);
         alert(`Task "${task}" completed successfully!`);
       } catch (error) {
-        console.error("Error saving task:", error);
         alert("Failed to save the task. Please try again.");
       }
     } else {
-      console.error("User is not authenticated");
       alert("You must be logged in to complete tasks.");
     }
   };
@@ -138,56 +131,58 @@ export default function TasksPage() {
           {userInitials}
         </div>
         <h1 className="text-3xl font-bold text-center">Your Tasks</h1>
-        {emotion && (
-          <div className="mt-4 text-center">
-            <h2 className="text-xl font-semibold">
-              Based on your emotion:{" "}
-              <p className="text-green-500 font-extrabold">{emotion}</p>
-            </h2>
 
-            <ul className="mt-4 space-y-2">
-              <h3 className="text-lg font-semibold">Pending Tasks</h3>
-              {tasks.map(
-                (taskObj, index) =>
-                  !completedTasks.includes(taskObj.task) && (
-                    <li
-                      key={index}
-                      className="flex items-center gap-3 bg-gray-100 p-3 rounded-lg shadow-sm"
-                    >
-                      <span className="text-2xl">
-                        {taskEmojis[taskObj.task]}
-                      </span>
-                      <div>
-                        <p className="font-medium">{taskObj.task}</p>
-                        <p className="text-sm text-gray-500">
-                          Duration: {taskObj.duration} mins
-                        </p>
-                        <button
-                          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                          onClick={() => saveTaskCompletion(taskObj.task)}
-                        >
-                          Mark as Complete
-                        </button>
-                      </div>
-                    </li>
-                  )
-              )}
-            </ul>
+        <React.Suspense fallback={<div>Loading...</div>}>
+          {emotion && (
+            <div className="mt-4 text-center">
+              <h2 className="text-xl font-semibold">
+                Based on your emotion:{" "}
+                <span className="text-green-500 font-extrabold">{emotion}</span>
+              </h2>
+              <ul className="mt-4 space-y-2">
+                <h3 className="text-lg font-semibold">Pending Tasks</h3>
+                {tasks.map(
+                  (taskObj, index) =>
+                    !completedTasks.includes(taskObj.task) && (
+                      <li
+                        key={index}
+                        className="flex items-center gap-3 bg-gray-100 p-3 rounded-lg shadow-sm"
+                      >
+                        <span className="text-2xl">
+                          {taskEmojis[taskObj.task] || "❓"}
+                        </span>
+                        <div>
+                          <p className="font-medium">{taskObj.task}</p>
+                          <p className="text-sm text-gray-500">
+                            Duration: {taskObj.duration} mins
+                          </p>
+                          <button
+                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                            onClick={() => saveTaskCompletion(taskObj.task)}
+                          >
+                            Mark as Complete
+                          </button>
+                        </div>
+                      </li>
+                    )
+                )}
+              </ul>
 
-            <ul className="mt-6 space-y-2">
-              <h3 className="text-lg font-semibold">Completed Tasks</h3>
-              {completedTasks.map((task, index) => (
-                <li
-                  key={index}
-                  className="flex items-center gap-3 bg-green-100 p-3 rounded-lg shadow-sm"
-                >
-                  <span className="text-2xl">{taskEmojis[task]}</span>
-                  <p className="font-medium">{task}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+              <ul className="mt-6 space-y-2">
+                <h3 className="text-lg font-semibold">Completed Tasks</h3>
+                {completedTasks.map((task, index) => (
+                  <li
+                    key={index}
+                    className="flex items-center gap-3 bg-green-100 p-3 rounded-lg shadow-sm"
+                  >
+                    <span className="text-2xl">{taskEmojis[task] || "❓"}</span>
+                    <p className="font-medium">{task}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </React.Suspense>
 
         <div className="mt-6 flex justify-center items-center w-full px-8">
           <Link href="/rewards">

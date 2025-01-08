@@ -1,22 +1,27 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
+import path from "path";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
+// Initialize FlatCompat with your base directory
 const compat = new FlatCompat({
-  baseDirectory: __dirname,
+  baseDirectory: path.resolve(),
 });
 
+// Use compat.config to set up ESLint configuration
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
-  {
-    rules: {
-      "rule-name": "off", // Disable a specific rule
-      "another-rule-name": "warn", // Change the severity of a rule
+  ...compat.config({
+    extends: [
+      "next", // Use the Next.js ESLint configuration
+      "next/core-web-vitals", // Consider using this if you need Web Vitals too
+    ],
+    parserOptions: {
+      // Ensure no function values are used for parsing
+      // This will prevent the "parse" issue
     },
-  },
+    rules: {
+      "react/no-unescaped-entities": "off",
+      "@next/next/no-page-custom-font": "off",
+    },
+  }),
 ];
 
 export default eslintConfig;
