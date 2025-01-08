@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -10,11 +11,16 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { useAuth } from "@/context/AuthContext"; // Assuming you have an auth context
+import toast from "react-hot-toast";
+
+interface User {
+  uid: string;
+}
 
 export default function ObjectivePage() {
-  const { user } = useAuth();
-  const [tasks, setTasks] = useState<string[]>([]); // Updated type from any[] to string[]
-  const [completedTasks, setCompletedTasks] = useState<string[]>([]); // Updated type from any[] to string[]
+  const { user } = useAuth() as { user: User | null }; // Ensures proper typing
+  const [tasks, setTasks] = useState<string[]>([]);
+  const [completedTasks, setCompletedTasks] = useState<string[]>([]);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
@@ -26,13 +32,12 @@ export default function ObjectivePage() {
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
             const userData = userDoc.data();
-            console.log("Fetched User Data:", userData); // Debug log
-
             setTasks(userData?.tasks || []);
             setCompletedTasks(userData?.completedTasks || []);
           }
         } catch (error) {
           console.error("Error fetching tasks:", error);
+          toast.error("Failed to load tasks. Please try again.");
         } finally {
           setLoading(false);
         }
@@ -45,7 +50,7 @@ export default function ObjectivePage() {
 
   const handleTaskDone = async (task: string) => {
     if (!user) {
-      alert("User is not logged in.");
+      toast.error("User is not logged in.");
       return;
     }
 
@@ -59,15 +64,16 @@ export default function ObjectivePage() {
       setTasks((prevTasks) => prevTasks.filter((t) => t !== task));
       setCompletedTasks((prevCompletedTasks) => [...prevCompletedTasks, task]);
 
-      console.log(`Task "${task}" marked as done.`);
+      toast.success(`Task "${task}" marked as done.`);
     } catch (error) {
       console.error("Error marking task as done:", error);
+      toast.error("Failed to mark task as done.");
     }
   };
 
   const handleTaskCancel = async (task: string) => {
     if (!user) {
-      alert("User is not logged in.");
+      toast.error("User is not logged in.");
       return;
     }
 
@@ -80,9 +86,10 @@ export default function ObjectivePage() {
 
       setTasks((prevTasks) => prevTasks.filter((t) => t !== task));
 
-      console.log(`Task "${task}" canceled.`);
+      toast.success(`Task "${task}" canceled.`);
     } catch (error) {
       console.error("Error canceling task:", error);
+      toast.error("Failed to cancel task.");
     }
   };
 
@@ -94,7 +101,9 @@ export default function ObjectivePage() {
         </h1>
 
         {loading ? (
-          <p className="text-center text-gray-600">Loading tasks...</p>
+          <div className="flex justify-center items-center mt-6">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500"></div>
+          </div>
         ) : (
           <>
             {/* Pending Tasks */}
@@ -159,7 +168,7 @@ export default function ObjectivePage() {
           </>
         )}
 
-        {/* Go to Home Page  */}
+        {/* Go to Home Page */}
         <div className="mt-6 text-center">
           <button
             onClick={() => router.push("/")}

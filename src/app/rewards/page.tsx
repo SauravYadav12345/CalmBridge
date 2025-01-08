@@ -71,7 +71,7 @@ export default function RewardsPage() {
             <div
               key={reward.name}
               onClick={() => handleRewardSelection(reward.name)}
-              className={`cursor-pointer p-4 bg-gray-200 rounded-lg shadow ${
+              className={`cursor-pointer p-4 bg-gray-200 rounded-lg shadow transition-all duration-200 ease-in-out transform hover:scale-105 ${
                 selectedReward === reward.name
                   ? "bg-indigo-500 text-white"
                   : "hover:bg-green-400"

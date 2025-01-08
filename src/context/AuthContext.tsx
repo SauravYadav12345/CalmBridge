@@ -29,15 +29,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(false); // Set loading to false after auth state is determined
     });
 
+    // Clean up the subscription on component unmount
     return () => unsubscribe();
   }, []);
 
+  // Handle redirection when the user is not authenticated
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/signin"); // Redirect only if user is not authenticated and loading is complete
+      router.push("/signin"); // Redirect if user is not authenticated and loading is complete
     }
   }, [loading, user, router]);
-  
+
   return (
     <AuthContext.Provider value={{ user, loading }}>
       {children}

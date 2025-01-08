@@ -15,7 +15,7 @@ export default function LogPage() {
     {
       date: string;
       emotion: string;
-      tasks: { task: string; status: string }[];
+      tasks: { task: string; status: string }[]; // Tasks specific to each emotion
     }[]
   >([]);
 
@@ -47,15 +47,19 @@ export default function LogPage() {
               emotion: entry.emotion,
             }));
 
-          // Build log data
-          const logs = filteredEmotions.map((entry) => ({
-            date: entry.date,
-            emotion: entry.emotion,
-            tasks: allTasks.map((task) => ({
+          // Build log data with tasks per emotion
+          const logs = filteredEmotions.map((entry) => {
+            const emotionTasks = allTasks.map((task) => ({
               task,
               status: completedTasks.includes(task) ? "Completed" : "Pending",
-            })),
-          }));
+            }));
+
+            return {
+              date: entry.date,
+              emotion: entry.emotion,
+              tasks: emotionTasks, // tasks for the specific emotion
+            };
+          });
 
           setLogData(logs);
         }
@@ -66,7 +70,7 @@ export default function LogPage() {
     };
 
     fetchLogData();
-  }, [user, router, loading]); // Ensuring `user`, `loading` and `router` are in the dependency array
+  }, [user, router, loading]); // Ensuring `user`, `loading`, and `router` are in the dependency array
 
   if (loading) {
     return <div>Loading...</div>; // Display loading state

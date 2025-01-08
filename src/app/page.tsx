@@ -7,9 +7,10 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebaseConfig";
 
+
 export default function HomePage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [userName, setUserName] = useState<string | null>(null);
 
   // Handle button click to navigate based on authentication
@@ -46,7 +47,7 @@ export default function HomePage() {
         {userName ? (
           <button
             onClick={() => router.push("/profile")}
-            className="text-lg  font-semibold text-blue-600 hover:bg-sky-300 hover:rounded-md hover:px-2 hover:py-1"
+            className="text-lg font-semibold text-blue-600 hover:bg-sky-300 hover:rounded-md hover:px-2 hover:py-1"
           >
             {userName}
           </button>
@@ -70,7 +71,7 @@ export default function HomePage() {
         Manage your Stress, Anxiety, & Depression with ease. We will help you
         feel life again from a new perspective.
       </p>
-      <p className="text-base sm:text-lg mb-8 text-center px-4 text-yellow-500 font-bold ">
+      <p className="text-base sm:text-lg mb-8 text-center px-4 text-yellow-500 font-bold">
         Take actionable steps to obtain a positive Impact on your Mental Health.
       </p>
 
@@ -86,21 +87,6 @@ export default function HomePage() {
         </button>
       </div>
 
-      {/* <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center">
-        <a
-          href="/signin"
-          className="px-4 py-2 bg-white text-blue-600 rounded-lg shadow hover:shadow-md hover:bg-gray-100 text-center"
-        >
-          Sign In
-        </a>
-        <a
-          href="/signup"
-          className="px-4 py-2 bg-blue-700 text-white rounded-lg shadow hover:shadow-md hover:bg-blue-800 text-center"
-        >
-          Sign Up
-        </a>
-      </div> */}
-
       <div className="mt-8">
         <Image
           src="https://plus.unsplash.com/premium_vector-1723130555423-89a41d83f3dd?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -112,7 +98,7 @@ export default function HomePage() {
       </div>
 
       {/* Wavy SVG */}
-      <div className=" bottom-0 w-full">
+      <div className="bottom-0 w-full">
         <svg
           viewBox="0 0 1440 320"
           xmlns="http://www.w3.org/2000/svg"

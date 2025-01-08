@@ -109,7 +109,6 @@ export default function TasksPage() {
     if (user?.uid) {
       const userRef = doc(db, "users", user.uid);
       try {
-        // Log to verify data is correct
         console.log(`Saving task: ${task}`);
         await updateDoc(userRef, {
           tasks: arrayRemove(task),
@@ -117,8 +116,6 @@ export default function TasksPage() {
         });
         setCompletedTasks((prev) => [...prev, task]);
         console.log(`Task "${task}" saved successfully.`);
-
-        // Provide feedback on task completion
         alert(`Task "${task}" completed successfully!`);
       } catch (error) {
         console.error("Error saving task:", error);
@@ -132,9 +129,7 @@ export default function TasksPage() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-white to-sky-300 text-gray-800">
-      {/* Card Container */}
-      <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-lg mx-4 md:mx-auto">
-        {/* User Initials at the Top Right */}
+      <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-lg mx-4 md:mx-auto relative">
         <div
           className="absolute top-4 right-6 bg-blue-600 text-white w-10 h-10 flex items-center justify-center rounded-full cursor-pointer"
           onClick={() => router.push("/profile")}
@@ -150,7 +145,6 @@ export default function TasksPage() {
               <p className="text-green-500 font-extrabold">{emotion}</p>
             </h2>
 
-            {/* Pending Tasks Section */}
             <ul className="mt-4 space-y-2">
               <h3 className="text-lg font-semibold">Pending Tasks</h3>
               {tasks.map(
@@ -180,7 +174,6 @@ export default function TasksPage() {
               )}
             </ul>
 
-            {/* Completed Tasks Section */}
             <ul className="mt-6 space-y-2">
               <h3 className="text-lg font-semibold">Completed Tasks</h3>
               {completedTasks.map((task, index) => (
@@ -196,7 +189,6 @@ export default function TasksPage() {
           </div>
         )}
 
-        {/* Navigation Buttons */}
         <div className="mt-6 flex justify-center items-center w-full px-8">
           <Link href="/rewards">
             <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">

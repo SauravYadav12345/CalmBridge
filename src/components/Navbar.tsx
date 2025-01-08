@@ -1,4 +1,4 @@
-import Link from "next/link"; // Make sure to import Link from 'next/link'
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/app/firebaseConfig";
@@ -11,11 +11,14 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      router.push("/");
+      router.push("/"); // Redirect to home after logout
     } catch (error) {
       console.error("Error logging out:", error);
     }
   };
+
+  // Close the menu after selecting a link or logging out
+  const handleMenuClose = () => setIsMenuOpen(false);
 
   return (
     <nav className="bg-sky-500 p-4 shadow-md w-full">
@@ -115,53 +118,64 @@ const Navbar = () => {
           <Link
             href="/"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
+            onClick={handleMenuClose}
           >
             Home
           </Link>
           <Link
             href="/emotions"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
+            onClick={handleMenuClose}
           >
             Emotions
           </Link>
           <Link
             href="/tasks"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
+            onClick={handleMenuClose}
           >
             Tasks
           </Link>
           <Link
             href="/rewards"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
+            onClick={handleMenuClose}
           >
             Rewards
           </Link>
           <Link
             href="/objective"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
+            onClick={handleMenuClose}
           >
             Objectives
           </Link>
           <Link
             href="/WeeklyLog"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
+            onClick={handleMenuClose}
           >
             WeeklyLog
           </Link>
           <Link
             href="/profile"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
+            onClick={handleMenuClose}
           >
             Profile
           </Link>
           <Link
             href="/signin"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
+            onClick={handleMenuClose}
           >
             SignIn
           </Link>
           <button
-            onClick={handleLogout}
+            onClick={() => {
+              handleLogout();
+              handleMenuClose();
+            }}
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
           >
             Logout
