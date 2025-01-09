@@ -55,9 +55,10 @@ function TasksContent() {
   };
 
   const tasks = useMemo(() => {
-    return emotion
-      ? tasksByEmotion[emotion] || [{ task: "No specific tasks.", duration: 0 }]
-      : [{ task: "No specific tasks.", duration: 0 }];
+    if (emotion && tasksByEmotion[emotion]) {
+      return tasksByEmotion[emotion];
+    }
+    return [];
   }, [emotion]);
 
   const taskEmojis: { [key: string]: string } = {
@@ -73,7 +74,6 @@ function TasksContent() {
     "Practice gratitude": "🙏",
     "Organize your space": "🧹",
     "Set goals for the week": "📅",
-    "No specific tasks.": "❓",
   };
 
   useEffect(() => {
@@ -89,9 +89,10 @@ function TasksContent() {
           const userData = userDoc.data();
           setCompletedTasks(userData?.completedTasks || []);
 
+          const validTasks = tasks.map((task)=>task.task  )
           if (!userData?.tasks || userData?.tasks.length === 0) {
             await updateDoc(userRef, {
-              tasks: arrayUnion(...tasks.map((task) => task.task)),
+              tasks: arrayUnion(...validTasks),
             });
           }
         }
