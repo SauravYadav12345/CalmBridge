@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import { useRouter } from "next/navigation";
+import { doc, setDoc } from "firebase/firestore"; // Firestore imports
+import { db } from "../firebaseConfig";
 
 export default function SignUp() {
   const [name, setName] = useState("");
@@ -25,7 +27,24 @@ export default function SignUp() {
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      // Create user with email and password
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      // Update Firebase Authentication profile with the name
+      const user = userCredential.user;
+      await updateProfile(user, { displayName: name });
+
+      // Store additional user data in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        name: name,
+        email: email,
+        createdAt: new Date(),
+      });
+
       router.push("/signin"); // Redirect to sign-in page after successful sign-up
     } catch (error: unknown) {
       if (error instanceof Error) {
