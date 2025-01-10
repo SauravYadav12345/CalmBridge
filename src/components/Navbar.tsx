@@ -45,28 +45,22 @@ const Navbar = () => {
             Emotions
           </Link>
           <Link
-            href="/tasks"
-            className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
-          >
-            Tasks
-          </Link>
-          <Link
-            href="/rewards"
-            className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
-          >
-            Rewards
-          </Link>
-          <Link
             href="/objective"
             className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
           >
-            Objectives
+            Objective
           </Link>
           <Link
             href="/WeeklyLog"
             className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
           >
             WeeklyLog
+          </Link>
+          <Link
+            href="/MonthlyLog"
+            className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
+          >
+            MonthlyLog
           </Link>
           <Link
             href="/profile"
@@ -130,20 +124,6 @@ const Navbar = () => {
             Emotions
           </Link>
           <Link
-            href="/tasks"
-            className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
-            onClick={handleMenuClose}
-          >
-            Tasks
-          </Link>
-          <Link
-            href="/rewards"
-            className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
-            onClick={handleMenuClose}
-          >
-            Rewards
-          </Link>
-          <Link
             href="/objective"
             className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
             onClick={handleMenuClose}
@@ -156,6 +136,13 @@ const Navbar = () => {
             onClick={handleMenuClose}
           >
             WeeklyLog
+          </Link>
+          <Link
+            href="/MonthlyLog"
+            className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
+            onClick={handleMenuClose}
+          >
+            MonthlyLog
           </Link>
           <Link
             href="/profile"
