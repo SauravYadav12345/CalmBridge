@@ -87,14 +87,19 @@ function TasksContent() {
 
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          setCompletedTasks(userData?.completedTasks || []);
+          const completed = Array.isArray(userData?.completedTasks)
+            ? userData.completedTasks
+            : [];
+          setCompletedTasks(completed);
 
-          const validTasks = tasks.map((task)=>task.task  )
-          if (!userData?.tasks || userData?.tasks.length === 0) {
+          const validTasks = tasks.map((task) => task.task);
+          if (!Array.isArray(userData?.tasks) || userData?.tasks.length === 0) {
             await updateDoc(userRef, {
               tasks: arrayUnion(...validTasks),
             });
           }
+        } else {
+          setCompletedTasks([]); // Initialize as empty array if no document exists
         }
       };
 
