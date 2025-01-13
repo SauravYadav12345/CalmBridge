@@ -31,7 +31,7 @@ const Navbar = () => {
         </h1>
 
         {/* Desktop Navbar */}
-        <div className="hidden md:flex space-x-3">
+        <div className="hidden md:flex space-x-2">
           <Link
             href="/"
             className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
@@ -61,6 +61,12 @@ const Navbar = () => {
             className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
           >
             MonthlyLog
+          </Link>
+          <Link
+            href="/earned-rewards"
+            className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
+          >
+            EarnedRewards
           </Link>
           <Link
             href="/profile"
@@ -143,6 +149,13 @@ const Navbar = () => {
             onClick={handleMenuClose}
           >
             MonthlyLog
+          </Link>
+          <Link
+            href="/earned-rewards"
+            className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
+            onClick={handleMenuClose}
+          >
+            EarnedRewards
           </Link>
           <Link
             href="/profile"

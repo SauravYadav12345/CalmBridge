@@ -40,6 +40,7 @@ export default function RewardsPage() {
           rewards: arrayUnion(selectedReward), // Add selected reward to Firestore
         });
         console.log("Reward successfully added to Firestore!");
+        alert("Successfully Submitted!!");
         router.push("/"); // Redirect to the Objective page after submission
       } catch (error) {
         console.error("Error adding reward to Firestore: ", error);
