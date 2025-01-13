@@ -14,9 +14,12 @@ import { useRouter } from "next/navigation";
 
 const ProfilePage = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [profileData, setProfileData] = useState<{ name: string; email: string } | null>(
-    null
-  );
+  const [profileData, setProfileData] = useState<{
+    name: string;
+    email: string;
+  } | null>(null);
+  const [streak, setStreak] = useState<number>(0);
+  const [lastEmotionDate, setLastEmotionDate] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -32,13 +35,18 @@ const ProfilePage = () => {
               name: currentUser.displayName || "Default Name",
               email: currentUser.email,
               createdAt: new Date(),
+              streak: 0,
+              lastEmotionDate: null,
             });
             setProfileData({
               name: currentUser.displayName || "Default Name",
               email: currentUser.email || "No Email",
             });
           } else {
-            setProfileData(userSnap.data() as { name: string; email: string });
+            const userData = userSnap.data();
+            setProfileData(userData as { name: string; email: string });
+            setStreak(userData?.streak || 0);
+            setLastEmotionDate(userData?.lastEmotionDate?.toDate() || null);
           }
         }
       } catch (error) {
@@ -59,6 +67,30 @@ const ProfilePage = () => {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (user && lastEmotionDate) {
+      const today = new Date();
+      const lastEmotionDay = new Date(lastEmotionDate).toDateString();
+      const todayDay = today.toDateString();
+
+      if (lastEmotionDay !== todayDay) {
+        setStreak((prevStreak) => prevStreak + 1);
+        updateUserStreak(user.uid, streak + 1);
+      }
+    }
+  }, [lastEmotionDate, user, streak]);
+
+  const updateUserStreak = async (uid: string, newStreak: number) => {
+    try {
+      await updateDoc(doc(db, "users", uid), {
+        streak: newStreak,
+        lastEmotionDate: new Date(),
+      });
+    } catch (error) {
+      console.error("Error updating streak:", error);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -98,7 +130,9 @@ const ProfilePage = () => {
     );
   }
 
-  const displayName = user ? profileData?.name?.slice(0, 2).toUpperCase() : "SI";
+  const displayName = user
+    ? profileData?.name?.slice(0, 2).toUpperCase()
+    : "SI";
 
   return (
     <div className="flex flex-col items-center p-6 bg-gradient-to-br from-white to-sky-300">
@@ -135,6 +169,26 @@ const ProfilePage = () => {
           </button>
         </>
       )}
+
+      {/* Streak Section */}
+      <section className="mt-8 bg-gradient-to-br from-cyan-200  to-emerald-500 rounded-lg p-6 shadow-lg">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-white">Current Streak</h2>
+          <p className="text-xl text-white mt-2">
+            {streak} days{" "}
+            {streak > 0 && streak % 1 === 0 && (
+              <span
+                role="img"
+                aria-label="fire"
+                className="text-4xl animate-pulse"
+              >
+                🔥
+              </span>
+            )}
+          </p>
+          <p className="text-lg text-white mt-2">Keep up the great work!🙂</p>
+        </div>
+      </section>
 
       <div className="w-full mt-5">
         <ObjectivePage />
