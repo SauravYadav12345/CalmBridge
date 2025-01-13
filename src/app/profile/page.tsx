@@ -19,7 +19,6 @@ const ProfilePage = () => {
     email: string;
   } | null>(null);
   const [streak, setStreak] = useState<number>(0);
-  const [lastEmotionDate, setLastEmotionDate] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -46,7 +45,42 @@ const ProfilePage = () => {
             const userData = userSnap.data();
             setProfileData(userData as { name: string; email: string });
             setStreak(userData?.streak || 0);
-            setLastEmotionDate(userData?.lastEmotionDate?.toDate() || null);
+
+            const today = new Date();
+            const lastEmotionDate = userData?.lastEmotionDate?.toDate() || null;
+            if (lastEmotionDate) {
+              const lastDate = new Date(lastEmotionDate).toDateString();
+              const todayDate = today.toDateString();
+
+              if (lastDate !== todayDate) {
+                const yesterday = new Date();
+                yesterday.setDate(today.getDate() - 1);
+
+                if (lastDate === yesterday.toDateString()) {
+                  // Increment streak if last emotion was logged yesterday
+                  const newStreak = (userData?.streak || 0) + 1;
+                  await updateDoc(userRef, {
+                    streak: newStreak,
+                    lastEmotionDate: today,
+                  });
+                  setStreak(newStreak);
+                } else {
+                  // Reset streak if last emotion was not logged yesterday
+                  await updateDoc(userRef, {
+                    streak: 1,
+                    lastEmotionDate: today,
+                  });
+                  setStreak(1);
+                }
+              }
+            } else {
+              // First emotion log
+              await updateDoc(userRef, {
+                streak: 1,
+                lastEmotionDate: today,
+              });
+              setStreak(1);
+            }
           }
         }
       } catch (error) {
@@ -67,30 +101,6 @@ const ProfilePage = () => {
 
     return () => unsubscribe();
   }, []);
-
-  useEffect(() => {
-    if (user && lastEmotionDate) {
-      const today = new Date();
-      const lastEmotionDay = new Date(lastEmotionDate).toDateString();
-      const todayDay = today.toDateString();
-
-      if (lastEmotionDay !== todayDay) {
-        setStreak((prevStreak) => prevStreak + 1);
-        updateUserStreak(user.uid, streak + 1);
-      }
-    }
-  }, [lastEmotionDate, user, streak]);
-
-  const updateUserStreak = async (uid: string, newStreak: number) => {
-    try {
-      await updateDoc(doc(db, "users", uid), {
-        streak: newStreak,
-        lastEmotionDate: new Date(),
-      });
-    } catch (error) {
-      console.error("Error updating streak:", error);
-    }
-  };
 
   const handleLogout = async () => {
     try {
@@ -171,7 +181,7 @@ const ProfilePage = () => {
       )}
 
       {/* Streak Section */}
-      <section className="mt-8 bg-gradient-to-br from-cyan-200  to-emerald-500 rounded-lg p-6 shadow-lg">
+      <section className="mt-8 bg-gradient-to-br from-cyan-200 to-emerald-500 rounded-lg p-6 shadow-lg">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-white">Current Streak</h2>
           <p className="text-xl text-white mt-2">
