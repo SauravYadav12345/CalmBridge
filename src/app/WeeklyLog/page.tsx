@@ -10,6 +10,9 @@ import Navbar from "@/components/Navbar";
 
 export default function LogPage() {
   const { user, loading } = useAuth();
+  const userInitials = user?.displayName
+    ? user.displayName.slice(0, 2).toUpperCase()
+    : "?";
   const router = useRouter();
   const [logData, setLogData] = useState<
     {
@@ -84,10 +87,22 @@ export default function LogPage() {
     return <div>Loading...</div>; // Display loading state
   }
 
+  const handleProfileClick = () => {
+    router.push("/profile");
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-white to-sky-300 text-gray-800">
       <Navbar />
+      
       <h1 className="text-3xl font-bold my-6">Your Weekly Log</h1>
+      <div
+        className="absolute top-20 right-4 bg-blue-600 text-white w-10 h-10 flex items-center justify-center rounded-full cursor-pointer shadow-lg"
+        onClick={handleProfileClick}
+        title="Go to Profile"
+      >
+        {userInitials}
+      </div>
       <div className="w-full max-w-4xl p-6 bg-white rounded-lg shadow-lg">
         {logData.length > 0 ? (
           logData.map((log, index) => (

@@ -9,6 +9,9 @@ import Navbar from "@/components/Navbar";
 
 function MonthlyLog() {
   const { user } = useAuth();
+  const userInitials = user?.displayName
+    ? user.displayName.slice(0, 2).toUpperCase()
+    : "?";
   const router = useRouter();
   const [emotions, setEmotions] = useState<
     { emotion: string; timestamp: string }[]
@@ -58,12 +61,23 @@ function MonthlyLog() {
     }
   }, [user]);
 
+  const handleProfileClick = () => {
+    router.push("/profile");
+  };
+
   const filteredEmotions = filterEmotionsByMonth(emotions, month);
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-white to-sky-300 text-gray-800">
       <Navbar />
-      <div className="bg-white shadow-lg mt-8 rounded-lg p-6 w-full max-w-lg mx-auto">
+      <div
+        className="absolute top-20 right-4 bg-blue-600 text-white w-10 h-10 flex items-center justify-center rounded-full cursor-pointer shadow-lg"
+        onClick={handleProfileClick}
+        title="Go to Profile"
+      >
+        {userInitials}
+      </div>
+      <div className="bg-white shadow-lg mt-16 rounded-lg p-6 w-full max-w-lg mx-auto">
         <h1 className="text-3xl font-bold text-center">Monthly Emotion Log</h1>
         <div className="mt-4 text-center">
           <h2 className="text-xl font-semibold">Emotions for {month}</h2>

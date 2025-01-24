@@ -18,7 +18,7 @@ interface User {
 }
 
 export default function ObjectivePage() {
-  const { user } = useAuth() as { user: User | null }; // Ensures proper typing
+  const { user } = useAuth(); // Ensures proper typing
   const [tasks, setTasks] = useState<string[]>([]);
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
   const router = useRouter();
@@ -30,6 +30,8 @@ export default function ObjectivePage() {
       router.push("/signin");
       return;
     }
+
+    const userInitials = user?.displayName?.slice(0, 2).toUpperCase() || "?";
 
     const fetchUserTasks = async () => {
       try {
@@ -102,7 +104,6 @@ export default function ObjectivePage() {
         <h1 className="text-3xl font-bold text-center text-gray-800">
           Today's Objective
         </h1>
-
         {loading ? (
           <div className="flex justify-center items-center mt-6">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500"></div>

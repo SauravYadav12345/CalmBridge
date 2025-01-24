@@ -13,6 +13,9 @@ interface Reward {
 
 export default function EarnedReward() {
   const { user } = useAuth();
+  const userInitials = user?.displayName
+    ? user.displayName.slice(0, 2).toUpperCase()
+    : "?";
   const router = useRouter();
   const [rewards, setRewards] = useState<
     { reward: string; timestamp?: Date }[]
@@ -49,10 +52,21 @@ export default function EarnedReward() {
     }
   }, [user]);
 
+  const handleProfileClick = () => {
+    router.push("/profile");
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-white to-green-300 text-gray-800">
       <Navbar />
-      <div className="bg-white shadow-lg mt-8 rounded-lg p-6 w-full max-w-lg mx-auto">
+      <div
+        className="absolute top-20 right-4 bg-blue-600 text-white w-10 h-10 flex items-center justify-center rounded-full cursor-pointer shadow-lg"
+        onClick={handleProfileClick}
+        title="Go to Profile"
+      >
+        {userInitials}
+      </div>
+      <div className="bg-white shadow-lg mt-16 rounded-lg p-6 w-full max-w-lg mx-auto">
         <h1 className="text-3xl font-bold text-center">Earned Rew ards</h1>
         <div className="mt-4 text-center">
           {rewards.length > 0 ? (
