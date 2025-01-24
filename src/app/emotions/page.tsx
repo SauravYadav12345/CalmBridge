@@ -2,11 +2,18 @@
 
 import { doc, setDoc, arrayUnion } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
-const emotionOptions = ["Happy", "Sad", "Stressed", "Anxious", "Depressed", "Neutral"];
+const emotionOptions = [
+  "Happy",
+  "Sad",
+  "Stressed",
+  "Anxious",
+  "Depressed",
+  "Neutral",
+];
 const emotionEmojis: Record<string, string> = {
   Happy: "😊",
   Sad: "😢",
@@ -18,13 +25,20 @@ const emotionEmojis: Record<string, string> = {
 
 export default function EmotionsPage() {
   const { user } = useAuth();
-  const userInitials = user?.displayName?.slice(0, 2).toUpperCase() || "?";
-
   const [emotion, setEmotion] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleEmotionClick = (selectedEmotion: string) => setEmotion(selectedEmotion);
+  useEffect(() => {
+    if (!user) {
+      router.push("/signin");
+    }
+  }, [user, router]);
+
+  const userInitials = user?.displayName?.slice(0, 2).toUpperCase() || "?";
+
+  const handleEmotionClick = (selectedEmotion: string) =>
+    setEmotion(selectedEmotion);
 
   const handleNextClick = async () => {
     if (!user) return router.push("/login");
@@ -51,6 +65,15 @@ export default function EmotionsPage() {
       setIsLoading(false);
     }
   };
+
+  // Showing a loader or placeholder while redirecting unauthenticated users
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-white to-sky-300">
+        <p className="text-lg font-medium text-gray-700">Redirecting...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-white to-sky-300 text-gray-800">

@@ -18,25 +18,32 @@ export default function LogPage() {
       tasks: { task: string; status: string }[]; // Tasks specific to each emotion
     }[]
   >([]);
+  const [isLoadingData, setIsLoadingData] = useState(false);
 
   useEffect(() => {
-    if (loading) return; // Return early if still loading
+    if (loading) return; // Wait for the authentication state to load
+
+    if (!user) {
+      // If the user is not logged in, redirect to signin page
+      router.push("/signin");
+      return;
+    }
 
     const fetchLogData = async () => {
-      if (user?.uid) {
+      setIsLoadingData(true);
+
+      try {
         const userRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userRef);
 
         if (userDoc.exists()) {
           const userData = userDoc.data();
 
-          // Extract emotions and tasks
           const emotions: { timestamp: string; emotion: string }[] =
             userData?.emotions || [];
           const completedTasks: string[] = userData?.completedTasks || [];
           const allTasks: string[] = userData?.tasks || [];
 
-          // Filter emotions for the last 7 days
           const sevenDaysAgo = new Date();
           sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -47,7 +54,6 @@ export default function LogPage() {
               emotion: entry.emotion,
             }));
 
-          // Build log data with tasks per emotion
           const logs = filteredEmotions.map((entry) => {
             const emotionTasks = allTasks.map((task) => ({
               task,
@@ -57,22 +63,24 @@ export default function LogPage() {
             return {
               date: entry.date,
               emotion: entry.emotion,
-              tasks: emotionTasks, // tasks for the specific emotion
+              tasks: emotionTasks,
             };
           });
 
           setLogData(logs);
         }
-      } else {
-        alert("You must be logged in to view the log.");
-        router.push("/signin");
+      } catch (error) {
+        console.error("Error fetching log data:", error);
+        alert("Failed to fetch log data. Please try again.");
+      } finally {
+        setIsLoadingData(false);
       }
     };
 
     fetchLogData();
-  }, [user, router, loading]); // Ensuring `user`, `loading`, and `router` are in the dependency array
+  }, [user, router, loading]);
 
-  if (loading) {
+  if (loading || isLoadingData) {
     return <div>Loading...</div>; // Display loading state
   }
 

@@ -36,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Handle redirection when the user is not authenticated
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/signin"); // Redirect if user is not authenticated and loading is complete
+      router.push("/"); // Redirect if user is not authenticated and loading is complete
     }
   }, [loading, user, router]);
 

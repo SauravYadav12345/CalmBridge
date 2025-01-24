@@ -25,28 +25,31 @@ export default function ObjectivePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      const fetchUserTasks = async () => {
-        try {
-          const userDocRef = doc(db, "users", user.uid);
-          const userDoc = await getDoc(userDocRef);
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            setTasks(userData?.tasks || []);
-            setCompletedTasks(userData?.completedTasks || []);
-          }
-        } catch (error) {
-          console.error("Error fetching tasks:", error);
-          toast.error("Failed to load tasks. Please try again.");
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchUserTasks();
-    } else {
-      setLoading(false);
+    if (!user) {
+      // Redirect to sign-in page if the user is not logged in
+      router.push("/signin");
+      return;
     }
-  }, [user]);
+
+    const fetchUserTasks = async () => {
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setTasks(userData?.tasks || []);
+          setCompletedTasks(userData?.completedTasks || []);
+        }
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+        toast.error("Failed to load tasks. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserTasks();
+  }, [user, router]);
 
   const handleTaskDone = async (task: string) => {
     if (!user) {

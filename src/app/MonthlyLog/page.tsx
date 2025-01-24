@@ -4,14 +4,22 @@ import React, { useState, useEffect } from "react";
 import { db } from "../firebaseConfig"; // Import Firebase config
 import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 
 function MonthlyLog() {
   const { user } = useAuth();
+  const router = useRouter();
   const [emotions, setEmotions] = useState<
     { emotion: string; timestamp: string }[]
   >([]);
   const [month, setMonth] = useState<string>("");
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/signin");
+    }
+  }, [user, router]);
 
   // Function to filter emotions by month
   const filterEmotionsByMonth = (emotions: any[], month: string) => {

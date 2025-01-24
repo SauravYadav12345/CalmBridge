@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { db } from "@/app/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 
 interface Reward {
@@ -12,7 +13,16 @@ interface Reward {
 
 export default function EarnedReward() {
   const { user } = useAuth();
-  const [rewards, setRewards] = useState<{ reward: string; timestamp?: Date }[]>([]);
+  const router = useRouter();
+  const [rewards, setRewards] = useState<
+    { reward: string; timestamp?: Date }[]
+  >([]);
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/signin");
+    }
+  }, [user, router]);
 
   useEffect(() => {
     if (user?.uid) {
@@ -43,12 +53,15 @@ export default function EarnedReward() {
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-white to-green-300 text-gray-800">
       <Navbar />
       <div className="bg-white shadow-lg mt-8 rounded-lg p-6 w-full max-w-lg mx-auto">
-        <h1 className="text-3xl font-bold text-center">Earned Rewards</h1>
+        <h1 className="text-3xl font-bold text-center">Earned Rew ards</h1>
         <div className="mt-4 text-center">
           {rewards.length > 0 ? (
             <ul className="mt-4 space-y-2">
               {rewards.map((reward, index) => (
-                <li key={index} className="bg-gray-100 p-3 rounded-lg shadow-sm">
+                <li
+                  key={index}
+                  className="bg-gray-100 p-3 rounded-lg shadow-sm"
+                >
                   <p className="font-medium">{reward.reward}</p>
                   <p className="text-sm text-gray-500">
                     {reward.timestamp
