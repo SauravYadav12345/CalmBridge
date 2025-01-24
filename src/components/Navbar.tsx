@@ -1,12 +1,20 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/app/firebaseConfig";
-import { signOut } from "firebase/auth";
+import { signOut, onAuthStateChanged } from "firebase/auth";
 
 const Navbar = () => {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggetIn] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsLoggetIn(!!user);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -74,18 +82,21 @@ const Navbar = () => {
           >
             Profile
           </Link>
-          <Link
-            href="/signin"
-            className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
-          >
-            SignIn
-          </Link>
-          <button
-            onClick={handleLogout}
-            className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
-          >
-            Logout
-          </button>
+          {isLoggedIn ? (
+            <button
+              onClick={handleLogout}
+              className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              href="/signin"
+              className="text-white hover:bg-sky-400 px-4 py-2 rounded-md transition-colors duration-300"
+            >
+              SignIn
+            </Link>
+          )}
         </div>
 
         {/* Mobile Hamburger Button */}
@@ -164,22 +175,25 @@ const Navbar = () => {
           >
             Profile
           </Link>
-          <Link
-            href="/signin"
-            className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
-            onClick={handleMenuClose}
-          >
-            SignIn
-          </Link>
-          <button
-            onClick={() => {
-              handleLogout();
-              handleMenuClose();
-            }}
-            className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
-          >
-            Logout
-          </button>
+          {isLoggedIn ? (
+            <button
+              onClick={() => {
+                handleLogout();
+                handleMenuClose();
+              }}
+              className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              href="/signin"
+              className="block px-4 py-2 text-lg hover:bg-sky-600 rounded-md transition-colors duration-300"
+              onClick={handleMenuClose}
+            >
+              SignIn
+            </Link>
+          )}
         </div>
       )}
     </nav>
